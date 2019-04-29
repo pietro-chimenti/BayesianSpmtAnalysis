@@ -1,0 +1,66 @@
+# This is the BayesianSpmtFit config file
+# date: 26/03/2019
+# author: Pietro Chimenti
+
+# following parameters define the input simulation file
+string simDataPath Data
+string simDataFile events_SPMT_1e+05evt_20190425.root
+string simTreeName FinalFitIBDTree
+
+# this is the classical oscillation factor to use with dimensional E, L and DelM2
+double oscFact 1.27
+# this is the IBD threshold
+double ibd_th 1.806
+# the following best fit are from nu-fit 4.0 (Nov.2018)
+# this are for nh
+double s2t12_nf 0.310
+double s2t23_nf 0.582
+# for IO s2t23_nf 0.02263
+double s2t13_nf 0.02240
+# error for s2t13
+double s2t13_err_nf 0.00065
+# for IO delcp_nf 280
+double delcp_nf 217
+double DelM2_21_nf 7.39e-5
+# for io DelM2_3l_nf=DelM2_32 -2.512
+# for NO DelM2_3l_nl-DelM2_31
+double DelM2_3l_nf 2.525e-3
+
+# total numer of measured neutrinos
+int tot_meas_events 120000
+
+# normalization relative error
+double norm_error 0.02
+
+# binning for fit
+int nBins 28
+double bin_0 0
+double bin_1 10
+double bin_2 20
+double bin_3 30
+double bin_4 40
+double bin_5 50
+double bin_6 60
+double bin_7 70
+double bin_8 80
+double bin_9 90
+double bin_10 100
+double bin_11 110
+double bin_12 120
+double bin_13 130
+double bin_14 140
+double bin_15 150
+double bin_16 160
+double bin_17 170
+double bin_18 180
+double bin_19 190
+double bin_20 200
+double bin_21 210
+double bin_22 220
+double bin_23 230
+double bin_24 240
+double bin_25 250
+double bin_26 260
+double bin_27 270
+double bin_28 280
+
