@@ -30,13 +30,15 @@
 #include <map>
 #include <tuple>
 
+#include "BayesianSpmtConfig.h"
+
 // ----------------------------------------------------------------------------
 class BayesianSpmtFit : public BCModel
 {
 
 public:
 
-    BayesianSpmtFit(const std::string& name);
+    BayesianSpmtFit(const std::string& name, BayesianSpmtConfig& config);
 
     ~BayesianSpmtFit();
 
@@ -101,22 +103,6 @@ public:
      *  plot spectra */
     void PlotNuFit();
 
-    /**
-     *  read configuration file and fill configuration maps */
-    void LoadConfig();
-
-    /**
-     * get the int value of the name configuration variable */
-    int getInt(std::string name);
-
-    /**
-     * get the double value of the name configuration variable */ 
-    double getDouble(std::string name);
-
-    /**
-     * get the string value of the name configuration variable */ 
-    std::string getString(std::string name);
-
 // ----------------------------------------------------------------------------
 // now fields
 //
@@ -158,25 +144,11 @@ public:
     TMatrixDSym M_stat; /// statistical error matrix: diagonal
     TMatrixDSym M_norm; /// normalization error matrix: fully correlated
 
-    /** 
-     *  now fields related to configuration
-     */  
+    // Configuration interface
 
-    /**
-     * name of configuration file */ 
-    static const std::string configFile;
+    BayesianSpmtConfig& myConfig;
 
-    /**
-     * map of integer parameters */ 
-    std::map<std::string, int> intParams;
 
-    /**
-     * map of double parameters */ 
-    std::map<std::string, double> doubleParams;
-
-    /**
-     * map of string parameters */ 
-    std::map<std::string, std::string> stringParams;
 };
 // ---------------------------------------------------------
 

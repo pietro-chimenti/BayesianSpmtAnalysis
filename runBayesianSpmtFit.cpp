@@ -1,14 +1,17 @@
 #include <BAT/BCLog.h>
 
 #include "BayesianSpmtFit.h"
+#include "BayesianSpmtConfig.h"
 
 int main()
 {
     // open log file
     BCLog::OpenLog("log.txt", BCLog::detail, BCLog::detail);
 
-    BayesianSpmtFit m("BayesianSpmtFit");
-    m.LoadConfig();
+    BayesianSpmtConfig myConfig;
+    myConfig.LoadConfig(std::string("config.txt"));
+
+    BayesianSpmtFit m("BayesianSpmtFit",myConfig);
     m.Setup();
 
     // show oscillation plot

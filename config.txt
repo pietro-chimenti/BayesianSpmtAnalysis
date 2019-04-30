@@ -2,6 +2,12 @@
 # date: 26/03/2019
 # author: Pietro Chimenti
 
+# following options define the paramenters 1: on, 0: off
+int s2t12 1
+int DelM2_21 1
+int s2t13 0
+
+
 # following parameters define the input simulation file
 string simDataPath Data
 string simDataFile events_SPMT_1e+05evt_20190425.root

@@ -9,21 +9,25 @@
 
 #include <BAT/BCLog.h>
 
-const std::string BayesianSpmtFit::configFile = "config.txt";
-
 // ----------------------------------------------------------------------------
-BayesianSpmtFit::BayesianSpmtFit(const std::string& name)
-    : BCModel(name)
+BayesianSpmtFit::BayesianSpmtFit(const std::string& name, BayesianSpmtConfig& config)
+    : BCModel(name), myConfig(config)
 {
 
-  AddParameter("s2t12", 0.29, 0.33, "#s2t12", "");
-  GetParameters().Back().SetPriorConstant();
- 
-  AddParameter("DelM2_21",7.1e-5,7.5e-5,"#DelM2_21","");
-  GetParameters().Back().SetPriorConstant();
+  if(myConfig.getInt(std::string("s2t12"))){
+    AddParameter("s2t12", 0.29, 0.33, "#s2t12", "");
+    GetParameter("s2t12").SetPriorConstant();
+  }
 
-  //AddParameter("s2t13",0.01,0.04,"#s2t13","");
-  //GetParameters().Back().SetPriorConstant();
+  if(myConfig.getInt(std::string("DelM2_21"))){
+    AddParameter("DelM2_21",7.1e-5,7.5e-5,"#DelM2_21","");
+    GetParameter("DelM2_21").SetPriorConstant();
+  }
+
+  if(myConfig.getInt(std::string("s2t13"))){
+    AddParameter("s2t13",0.01,0.04,"#s2t13","");
+    GetParameter("s2t13").SetPriorConstant();
+  }
 
   AddObservable("s22t12", 0.86, 0.87, "#s22t12", "");
 
@@ -62,9 +66,10 @@ double BayesianSpmtFit::LogLikelihood(const std::vector<double>& pars)
       ll+=(residuals[i])*M_inv[i][j]*(residuals[j]);
 
   // now add pulls
-  double s2t13_nf = getDouble("s2t13_nf");
-  double s2t13_err_nf = getDouble("s2t13_err_nf");
-  //ll+=( (pars[2]-s2t13_nf)*(pars[2]-s2t13_nf) )/( s2t13_err_nf*s2t13_err_nf );
+  double s2t13_nf = myConfig.getDouble("s2t13_nf");
+  double s2t13_err_nf = myConfig.getDouble("s2t13_err_nf");
+  if(myConfig.getInt(std::string("s2t13")))
+    ll+=( (pars[2]-s2t13_nf)*(pars[2]-s2t13_nf) )/( s2t13_err_nf*s2t13_err_nf );
 
   ll*=-0.5;
 
@@ -93,9 +98,9 @@ void BayesianSpmtFit::Setup()
 // ----------------------------------------------------------------------------
 void BayesianSpmtFit::LoadSimTree()
 {
-  std::string filename=getString("simDataPath")+"/"+getString("simDataFile");
+  std::string filename=myConfig.getString("simDataPath")+"/"+myConfig.getString("simDataFile");
   TFile f(filename.c_str());
-  simTree = (TTree*) f.Get(getString("simTreeName").c_str());
+  simTree = (TTree*) f.Get(myConfig.getString("simTreeName").c_str());
   //simTree->Print();
 
   Double_t NeutrinoEnergy_Th;
@@ -114,10 +119,10 @@ void BayesianSpmtFit::LoadSimTree()
 // ----------------------------------------------------------------------------
 void BayesianSpmtFit::LoadBins()
 {
-  int nBins = getInt("nBins");  
+  int nBins = myConfig.getInt("nBins");  
   for(int i = 0; i<=nBins; i++){
     std::string binName = std::string("bin_")+std::to_string(i);
-    double binLimit = getDouble(binName);
+    double binLimit = myConfig.getDouble(binName);
     binLimits.push_back(binLimit); 
     if(i>0){
       spectrum_th.push_back(0);
@@ -127,80 +132,9 @@ void BayesianSpmtFit::LoadBins()
 }
 
 // ----------------------------------------------------------------------------
-void BayesianSpmtFit::LoadConfig()
-{
-  BCLog::OutSummary("Loading Config");
-  std::string line;
-  std::ifstream inFile(configFile.c_str());
-  if(inFile.is_open()){
-    while(getline(inFile,line)){
-      bool isBlanck = true;
-      for( std::string::const_iterator it = line.begin(); it!= line.end(); ++it){
-        if(!isspace(*it)){
-          isBlanck = false;
-          break;
-        }
-      }
-      if(isBlanck) continue;
-      //BCLOG_SUMMARY(line.c_str());
-      BCLog::OutSummary(line.c_str());
-      
-      std::istringstream iss(line);
-      std::string tag;
-      std::string key;
-      iss >> tag;
-      if(tag=="#") continue;
-      if(tag=="int"){
-        int value;
-        iss >> key;
-        iss >> value;
-        intParams.insert(std::pair<std::string,int>(key,value));
-        BCLog::OutDebug("int param");
-      }
-      if(tag=="double"){
-        double value;
-        iss >> key;
-        iss >> value;
-        doubleParams.insert(std::pair<std::string,double>(key,value));
-        BCLog::OutDebug("double param");
-      }
-      if(tag=="string"){
-        std::string value;
-        iss >> key;
-        iss >> value;
-        stringParams.insert(std::pair<std::string,std::string>(key,value));
-        BCLog::OutDebug("int param");
-      }
-        
-    }
-  }
-}
-
-// ----------------------------------------------------------------------------
-int BayesianSpmtFit::getInt(std::string name)
-{
-  if(intParams.find(name)==intParams.end()) throw std::out_of_range("Unable to fine"+name);
-  return intParams.find(name)->second;
-}
-
-// ----------------------------------------------------------------------------
-double BayesianSpmtFit::getDouble(std::string name)
-{
-  if(doubleParams.find(name)==doubleParams.end()) throw std::out_of_range("Unable to fine"+name);
-  return doubleParams.find(name)->second;
-}
-
-// ----------------------------------------------------------------------------
-std::string BayesianSpmtFit::getString(std::string name)
-{
-  if(stringParams.find(name)==stringParams.end()) throw std::out_of_range("Unable to fine"+name);
-  return stringParams.find(name)->second;
-}
-
-// ----------------------------------------------------------------------------
 double BayesianSpmtFit::Pee(double E, double L)
 {
-  double oscFact = getDouble("oscFact");
+  double oscFact = myConfig.getDouble("oscFact");
 
   double prob = 1;
 
@@ -261,7 +195,7 @@ void BayesianSpmtFit::set_m_stat()
 // ----------------------------------------------------------------------------
 void BayesianSpmtFit::set_m_norm()
 {
-  double norm_error = getDouble("norm_error");
+  double norm_error = myConfig.getDouble("norm_error");
   M_norm.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
   for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
     for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
@@ -305,7 +239,7 @@ void BayesianSpmtFit::LoadSpectrumExp()
   }
 
   // now normalize to total number of events:
-  tot_events = getInt("tot_meas_events");
+  tot_events = myConfig.getInt("tot_meas_events");
   double sum=0;
   for(unsigned int i =0; i<spectrum_exp.size(); ++i) sum+=spectrum_exp[i];
   normalization=tot_events/sum;
@@ -318,11 +252,11 @@ void BayesianSpmtFit::LoadSpectrumExp()
 // ----------------------------------------------------------------------------
 void BayesianSpmtFit::SetNuFit_NO()
 {
-  s2t12=getDouble("s2t12_nf");
-  s2t23=getDouble("s2t23_nf");
-  s2t13=getDouble("s2t13_nf");
-  DelM2_21=getDouble("DelM2_21_nf");
-  DelM2_31=getDouble("DelM2_3l_nf");
+  s2t12=myConfig.getDouble("s2t12_nf");
+  s2t23=myConfig.getDouble("s2t23_nf");
+  s2t13=myConfig.getDouble("s2t13_nf");
+  DelM2_21=myConfig.getDouble("DelM2_21_nf");
+  DelM2_31=myConfig.getDouble("DelM2_3l_nf");
 }
 
 // ----------------------------------------------------------------------------
