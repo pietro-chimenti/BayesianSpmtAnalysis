@@ -12,18 +12,12 @@ int main()
     myConfig.LoadConfig(std::string("config.txt"));
 
     BayesianSpmtFit m("BayesianSpmtFit",myConfig);
-    m.Setup();
 
-    // show oscillation plot
-    m.SetNuFit_NO();
-
-    m.LoadSpectrumExp();
-    m.PlotNuFit();
     m.SetNChains(1);
-    m.SetNIterationsPreRunCheck(300);
-    m.SetNIterationsPreRunMin(900);
-    m.SetNIterationsPreRunMax(3000);
-    m.SetNIterationsRun(3000);
+    m.SetNIterationsPreRunCheck(30);
+    m.SetNIterationsPreRunMin(90);
+    m.SetNIterationsPreRunMax(300);
+    m.SetNIterationsRun(300);
 
     BCLog::OutSummary("Test model created");
     m.WriteMarkovChain(m.GetSafeName() + "_mcmc.root", "RECREATE");

@@ -49,16 +49,16 @@ public:
     void CalculateObservables(const std::vector<double> & pars);
 
     /**
-     * here we config the model */ 
-    void Setup();
-
-    /**
      * here we load the simulation tree */
     void LoadSimTree();  
 
     /**
      * here we load the bin limits */ 
     void LoadBins();    
+
+    /**
+     * here we load oscillation parameters from fit parameters */ 
+    void LoadParameters(const std::vector<double>& pars);
 
     /**
      * here we load the simulated experimental spectrum
@@ -75,8 +75,8 @@ public:
     double Pee(double E, double L);
 
     /**
-     *  set nu-fit values oscillation parameters for NO */
-    void SetNuFit_NO();
+     *  set initial values for oscillation parameters */
+    void InitOscPars();
 
 
     /**
@@ -106,6 +106,10 @@ public:
 // ----------------------------------------------------------------------------
 // now fields
 //
+
+    /**
+     * used for bookeeping parameters */
+    std::vector<std::string> book; 
 
     /**
      *  ttree of simulated IBD interactions */ 
@@ -138,11 +142,14 @@ public:
     double tot_events; /// normalization
     double normalization; /// calculated from tot_event
 
-    /// now error matrixes
+    /// now error matrixes and pull terms
     TMatrixDSym M_inv; /// inverse ot the total error matrix
     TMatrixDSym M_total; /// total error matrix: stat + norm
     TMatrixDSym M_stat; /// statistical error matrix: diagonal
     TMatrixDSym M_norm; /// normalization error matrix: fully correlated
+
+    double pull_s2t13;
+    double pull_s2t13_err;
 
     // Configuration interface
 

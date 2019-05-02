@@ -3,9 +3,12 @@
 # author: Pietro Chimenti
 
 # following options define the paramenters 1: on, 0: off
-int s2t12 1
-int DelM2_21 1
-int s2t13 0
+int par_s2t12    1
+int par_DelM2_21 1
+int par_s2t13    1
+
+# following options define the LL terms: 1 - on, 0 - off
+int ll_norm 1 
 
 
 # following parameters define the input simulation file
@@ -17,26 +20,30 @@ string simTreeName FinalFitIBDTree
 double oscFact 1.27
 # this is the IBD threshold
 double ibd_th 1.806
-# the following best fit are from nu-fit 4.0 (Nov.2018)
+
+# the following initial values are from nu-fit 4.0 (Nov.2018)
 # this are for nh
-double s2t12_nf 0.310
-double s2t23_nf 0.582
-# for IO s2t23_nf 0.02263
-double s2t13_nf 0.02240
-# error for s2t13
-double s2t13_err_nf 0.00065
-# for IO delcp_nf 280
-double delcp_nf 217
-double DelM2_21_nf 7.39e-5
-# for io DelM2_3l_nf=DelM2_32 -2.512
-# for NO DelM2_3l_nl-DelM2_31
-double DelM2_3l_nf 2.525e-3
+double init_s2t12 0.310
+double init_s2t23 0.582
+# for IO s2t23 0.02263
+# s2t13: check pull term as well!
+double init_s2t13 0.02240
+# for IO delcp 280
+double init_delcp 217
+double init_DelM2_21 7.39e-5
+# for io DelM2_3l=DelM2_32 -2.512
+# for NO DelM2_3l=DelM2_31
+double init_DelM2_31 2.525e-3
 
 # total numer of measured neutrinos
 int tot_meas_events 120000
 
 # normalization relative error
 double norm_error 0.02
+
+# s2t13 pull terms
+double pull_s2t13 0.02240
+double pull_s2t13_err 0.00065
 
 # binning for fit
 int nBins 28

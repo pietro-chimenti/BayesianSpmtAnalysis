@@ -11,26 +11,37 @@
 
 // ----------------------------------------------------------------------------
 BayesianSpmtFit::BayesianSpmtFit(const std::string& name, BayesianSpmtConfig& config)
-    : BCModel(name), myConfig(config)
+    : BCModel(name), book(), myConfig(config)
 {
+  // define parameters, observables, priors and set initial values
 
-  if(myConfig.getInt(std::string("s2t12"))){
+  if(myConfig.getInt(std::string("par_s2t12"))){
     AddParameter("s2t12", 0.29, 0.33, "#s2t12", "");
     GetParameter("s2t12").SetPriorConstant();
+    book.push_back("s2t12");
   }
 
-  if(myConfig.getInt(std::string("DelM2_21"))){
+  if(myConfig.getInt(std::string("par_DelM2_21"))){
     AddParameter("DelM2_21",7.1e-5,7.5e-5,"#DelM2_21","");
     GetParameter("DelM2_21").SetPriorConstant();
+    book.push_back("DelM2_21");
   }
 
-  if(myConfig.getInt(std::string("s2t13"))){
+  if(myConfig.getInt(std::string("par_s2t13"))){
     AddParameter("s2t13",0.01,0.04,"#s2t13","");
     GetParameter("s2t13").SetPriorConstant();
+    book.push_back("s2t13");
   }
 
-  AddObservable("s22t12", 0.86, 0.87, "#s22t12", "");
+  AddObservable("s22t12", 0., 1., "#s22t12", "");
 
+
+  // initialize oscilation parameters
+  InitOscPars();
+  LoadSimTree();
+  LoadBins();
+  LoadSpectrumExp();
+//  PlotNuFit();
 
 }
 
@@ -40,36 +51,33 @@ BayesianSpmtFit::~BayesianSpmtFit()
 }
 
 // ----------------------------------------------------------------------------
+void BayesianSpmtFit::LoadParameters(const std::vector<double>& pars)
+{
+
+  for( unsigned int i=0; i < pars.size(); ++i ){ 
+    if( book[i] == "s2t12" )    s2t12    = pars[i];
+    if( book[i] == "DelM2_21" ) DelM2_21 = pars[i];
+    if( book[i] == "s2t13" )    s2t13    = pars[i];
+  }
+}
+
+// ----------------------------------------------------------------------------
 double BayesianSpmtFit::LogLikelihood(const std::vector<double>& pars)
 {
-  static int call_number = 0; // to monitor calls
-  ++call_number;
-  std::cout << " call LL " << call_number << std::endl; 
-  std::cout << pars[0] << " " << pars[1] << " " << pars[2] << std::endl; 
-
   double ll=0;
 
-  // set parameters and theoretical spectrum
-  s2t12 = pars[0];
-  DelM2_21 = pars[1];
-  s2t13 = pars[2];
+  LoadParameters(pars);
   LoadSpectrumTh();
-
-  // calculate residuals
-  std::vector<double> residuals(spectrum_exp.size());
-  for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
-    residuals[i]=(spectrum_exp[i]-spectrum_th[i]);
 
   // calculate terms related to covariance matrix
   for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
     for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
-      ll+=(residuals[i])*M_inv[i][j]*(residuals[j]);
+      ll+=(spectrum_exp[i]-spectrum_th[i])*M_inv[i][j]*(spectrum_exp[j]-spectrum_th[j]);
 
   // now add pulls
-  double s2t13_nf = myConfig.getDouble("s2t13_nf");
-  double s2t13_err_nf = myConfig.getDouble("s2t13_err_nf");
-  if(myConfig.getInt(std::string("s2t13")))
-    ll+=( (pars[2]-s2t13_nf)*(pars[2]-s2t13_nf) )/( s2t13_err_nf*s2t13_err_nf );
+  if(myConfig.getInt(std::string("par_s2t13"))){
+   ll+=( (s2t13-pull_s2t13)*(s2t13-pull_s2t13) )/( pull_s2t13_err*pull_s2t13_err );
+  }
 
   ll*=-0.5;
 
@@ -85,14 +93,8 @@ double BayesianSpmtFit::LogLikelihood(const std::vector<double>& pars)
 // ----------------------------------------------------------------------------
 void BayesianSpmtFit::CalculateObservables(const std::vector<double>& pars)
 {
-  GetObservable(0) = 4*pars[0]*(1-pars[0]);
-}
-
-// ----------------------------------------------------------------------------
-void BayesianSpmtFit::Setup()
-{
-  LoadSimTree();
-  LoadBins();
+  LoadParameters(pars);
+  GetObservable("s22t12") = 4*s2t12*(1-s2t12);
 }
 
 // ----------------------------------------------------------------------------
@@ -179,7 +181,7 @@ void BayesianSpmtFit::set_m_total()
   set_m_norm();
   M_total.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
   M_total = M_stat;
-  //M_total = M_stat+M_norm;
+  if( myConfig.getInt("ll_norm") ) M_total += M_norm;
 }
 
 // ----------------------------------------------------------------------------
@@ -217,7 +219,7 @@ void BayesianSpmtFit::LoadSpectrumTh()
     spectrum_th[index]+=Pee(nuE,nuL);
   }
 
-  // now normalize to total number of events:
+  // now normalize:
   for(unsigned int i =0; i<spectrum_th.size(); ++i) spectrum_th[i]*=normalization;
  
 
@@ -250,13 +252,17 @@ void BayesianSpmtFit::LoadSpectrumExp()
 }
 
 // ----------------------------------------------------------------------------
-void BayesianSpmtFit::SetNuFit_NO()
+void BayesianSpmtFit::InitOscPars()
 {
-  s2t12=myConfig.getDouble("s2t12_nf");
-  s2t23=myConfig.getDouble("s2t23_nf");
-  s2t13=myConfig.getDouble("s2t13_nf");
-  DelM2_21=myConfig.getDouble("DelM2_21_nf");
-  DelM2_31=myConfig.getDouble("DelM2_3l_nf");
+  s2t12=myConfig.getDouble("init_s2t12");
+  s2t23=myConfig.getDouble("init_s2t23");
+  s2t13=myConfig.getDouble("init_s2t13");
+  DelM2_21=myConfig.getDouble("init_DelM2_21");
+  DelM2_31=myConfig.getDouble("init_DelM2_31");
+
+  pull_s2t13 = myConfig.getDouble("pull_s2t13");
+  pull_s2t13_err = myConfig.getDouble("pull_s2t13_err");
+
 }
 
 // ----------------------------------------------------------------------------
