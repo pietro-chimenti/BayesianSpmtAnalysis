@@ -100,6 +100,11 @@ public:
     void set_m_norm();
 
     /**
+     * calculate the shape error matrix: fully uncorrelated approx */ 
+    void set_m_b2b();
+
+
+    /**
      *  plot spectra */
     void PlotNuFit();
 
@@ -147,6 +152,7 @@ public:
     TMatrixDSym M_total; /// total error matrix: stat + norm
     TMatrixDSym M_stat; /// statistical error matrix: diagonal
     TMatrixDSym M_norm; /// normalization error matrix: fully correlated
+    TMatrixDSym M_b2b;
 
     double pull_s2t13;
     double pull_s2t13_err;

@@ -182,6 +182,7 @@ void BayesianSpmtFit::set_m_total()
   M_total.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
   M_total = M_stat;
   if( myConfig.getInt("ll_norm") ) M_total += M_norm;
+  if( myConfig.getInt("ll_b2b") ) M_total += M_b2b;
 }
 
 // ----------------------------------------------------------------------------
@@ -202,6 +203,17 @@ void BayesianSpmtFit::set_m_norm()
   for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
     for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
       M_norm[i][j]=norm_error*norm_error*spectrum_exp[i]*spectrum_exp[j];  
+}
+
+// ----------------------------------------------------------------------------
+void BayesianSpmtFit::set_m_b2b()
+{
+  double b2b_error = myConfig.getDouble("b2b_error");
+  M_b2b.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
+  for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
+    for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
+      if( i == j ) M_b2b[i][j] = b2b_error*b2b_error*spectrum_exp[i]*spectrum_exp[j];  
+      else M_b2b[i][j] = 0;
 }
 
 // ----------------------------------------------------------------------------
