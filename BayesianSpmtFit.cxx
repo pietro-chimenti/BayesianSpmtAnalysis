@@ -160,9 +160,9 @@ double BayesianSpmtFit::Pee(double E, double L)
 // ----------------------------------------------------------------------------
 int BayesianSpmtFit::get_bin(double e)
 {
-  for(unsigned int i=0; i< binLimits.size(); ++i ) 
+  for(unsigned int i = 0; i <= binLimits.size(); ++i ) 
     if(e<binLimits[i]) return i;
-  return binLimits.size();
+  return binLimits.size()+1;
 }
 
 // ----------------------------------------------------------------------------
@@ -216,6 +216,7 @@ void BayesianSpmtFit::LoadSpectrumTh()
   for(auto i : vectorELP){
     std::tie(nuE,nuL,visE) = i;
     index=get_bin(visE); 
+    if(index==0||index==binLimits.size()+1) continue;
     spectrum_th[index]+=Pee(nuE,nuL);
   }
 
@@ -237,6 +238,7 @@ void BayesianSpmtFit::LoadSpectrumExp()
   for(auto i : vectorELP){
     std::tie(nuE,nuL,visE) = i;
     index=get_bin(visE); 
+    if(index==0||index==binLimits.size()+1) continue;
     spectrum_exp[index]+=Pee(nuE,nuL);
   }
 

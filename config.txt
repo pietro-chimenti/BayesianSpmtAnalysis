@@ -36,19 +36,15 @@ double oscFact 1.27
 # this is the IBD threshold
 double ibd_th 1.806
 
-# the following initial values are from nu-fit 4.0 (Nov.2018)
+# the following initial values are from PDG 2016 
 # this are for nh
-double init_s2t12 0.310
-double init_s2t23 0.582
-# for IO s2t23 0.02263
+double init_s2t12 0.304
+double init_s2t23 0.51
 # s2t13: check pull term as well!
-double init_s2t13 0.02240
-# for IO delcp 280
+double init_s2t13 0.0219
 double init_delcp 217
-double init_DelM2_21 7.39e-5
-# for io DelM2_3l=DelM2_32 -2.512
-# for NO DelM2_3l=DelM2_31
-double init_DelM2_31 2.525e-3
+double init_DelM2_21 7.53e-5
+double init_DelM2_31 2.44e-3
 
 # total numer of measured neutrinos
 int tot_meas_events 120000
@@ -57,38 +53,110 @@ int tot_meas_events 120000
 double norm_error 0.02
 
 # s2t13 pull terms
-double pull_s2t13 0.02240
-double pull_s2t13_err 0.00065
+double pull_s2t13 0.0219
+# isso mesmo?
+double pull_s2t13_err 0.0012
 
 # binning for fit
-int nBins 28
-double bin_0 0
-double bin_1 10
-double bin_2 20
-double bin_3 30
-double bin_4 40
-double bin_5 50
-double bin_6 60
-double bin_7 70
-double bin_8 80
-double bin_9 90
-double bin_10 100
-double bin_11 110
-double bin_12 120
-double bin_13 130
-double bin_14 140
-double bin_15 150
-double bin_16 160
-double bin_17 170
-double bin_18 180
-double bin_19 190
-double bin_20 200
-double bin_21 210
-double bin_22 220
-double bin_23 230
-double bin_24 240
-double bin_25 250
-double bin_26 260
-double bin_27 270
-double bin_28 280
-
+int nBins 100
+double bin_0 25
+double bin_1 29
+double bin_2 33
+double bin_3 37
+double bin_4 41
+double bin_5 45
+double bin_6 49
+double bin_7 53
+double bin_8 57
+double bin_9 61
+double bin_10 65
+double bin_11 69
+double bin_12 73
+double bin_13 77
+double bin_14 81
+double bin_15 85
+double bin_16 89
+double bin_17 93
+double bin_18 97
+double bin_19 101
+double bin_20 105
+double bin_21 109
+double bin_22 113
+double bin_23 117
+double bin_24 121
+double bin_25 125
+double bin_26 129
+double bin_27 133
+double bin_28 137
+double bin_29 141
+double bin_30 145
+double bin_31 149
+double bin_32 153
+double bin_33 157
+double bin_34 161
+double bin_35 165
+double bin_36 169
+double bin_37 173
+double bin_38 177
+double bin_39 181
+double bin_40 185
+double bin_41 189
+double bin_42 193
+double bin_43 197
+double bin_44 201
+double bin_45 205
+double bin_46 209
+double bin_47 213
+double bin_48 217
+double bin_49 221
+double bin_50 225
+double bin_51 229
+double bin_52 233
+double bin_53 237
+double bin_54 241
+double bin_55 245
+double bin_56 249
+double bin_57 253
+double bin_58 257
+double bin_59 261
+double bin_60 265
+double bin_61 269
+double bin_62 273
+double bin_63 277
+double bin_64 281
+double bin_65 285
+double bin_66 289
+double bin_67 293
+double bin_68 297
+double bin_69 301
+double bin_70 305
+double bin_71 309
+double bin_72 313
+double bin_73 317
+double bin_74 321
+double bin_75 325
+double bin_76 329
+double bin_77 333
+double bin_78 337
+double bin_79 341
+double bin_80 345
+double bin_81 349
+double bin_82 353
+double bin_83 357
+double bin_84 361
+double bin_85 365
+double bin_86 369
+double bin_87 373
+double bin_88 377
+double bin_89 381
+double bin_90 385
+double bin_91 389
+double bin_92 393
+double bin_93 397
+double bin_94 401
+double bin_95 405
+double bin_96 409
+double bin_97 413
+double bin_98 417
+double bin_99 421
+double bin_100 425
