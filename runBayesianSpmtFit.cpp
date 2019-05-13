@@ -3,40 +3,46 @@
 #include "BayesianSpmtFit.h"
 #include "BayesianSpmtConfig.h"
 
-int main()
+int main( int argc, char *argv[] )
 {
-    // open log file
-    BCLog::OpenLog("log.txt", BCLog::detail, BCLog::detail);
 
-    BayesianSpmtConfig myConfig;
-    myConfig.LoadConfig(std::string("config.txt"));
+  if( argc != 2 ){
+    std::cout << " usage: " << argv[0] << " <filename>\n";
+    return -1;
+  }
 
-    BayesianSpmtFit m("BayesianSpmtFit",myConfig);
+  // open log file
+  BCLog::OpenLog("log.txt", BCLog::detail, BCLog::detail);
 
-    m.SetNChains(1);
-    m.SetNIterationsPreRunCheck(30);
-    m.SetNIterationsPreRunMin(90);
-    m.SetNIterationsPreRunMax(300);
-    m.SetNIterationsRun(300);
+  BayesianSpmtConfig myConfig;
+  myConfig.LoadConfig(std::string(argv[1]));
 
-    BCLog::OutSummary("Test model created");
-    m.WriteMarkovChain(m.GetSafeName() + "_mcmc.root", "RECREATE");
-    m.MarginalizeAll(BCIntegrate::kMargMetropolis);
-    BCLog::OutSummary("Marginalized done");
-    m.FindMode(m.GetBestFitParameters());
-    BCLog::OutSummary("FindMode done");
+  BayesianSpmtFit m("BayesianSpmtFit",myConfig);
 
-    m.PrintAllMarginalized(m.GetSafeName() + "_plots.pdf");
+  m.SetNChains(myConfig.getInt("NC"));
+  m.SetNIterationsPreRunCheck(myConfig.getInt("NIPRC"));
+  m.SetNIterationsPreRunMin(myConfig.getInt("NIPRMI"));
+  m.SetNIterationsPreRunMax(myConfig.getInt("NIPRMA"));
+  m.SetNIterationsRun(myConfig.getInt("NIR"));
 
-    m.PrintParameterPlot(m.GetSafeName() + "_parameters.pdf");
-    m.PrintCorrelationPlot(m.GetSafeName() + "_correlation.pdf");
-    m.PrintCorrelationMatrix(m.GetSafeName() + "_correlationMatrix.pdf");
-    m.PrintKnowledgeUpdatePlots(m.GetSafeName() + "_update.pdf");
+  BCLog::OutSummary("Test model created");
+  m.WriteMarkovChain(myConfig.getString("outpath") + m.GetSafeName() + "_mcmc.root", "RECREATE");
+  m.MarginalizeAll(BCIntegrate::kMargMetropolis);
+  BCLog::OutSummary("Marginalized done");
+  m.FindMode(m.GetBestFitParameters());
+  BCLog::OutSummary("FindMode done");
 
-    m.PrintSummary();
+  m.PrintAllMarginalized(myConfig.getString("outpath") + m.GetSafeName() + "_plots.pdf");
 
-    BCLog::OutSummary("Exiting");
-    BCLog::CloseLog();
+  m.PrintParameterPlot(myConfig.getString("outpath") + m.GetSafeName() + "_parameters.pdf");
+  m.PrintCorrelationPlot(myConfig.getString("outpath") + m.GetSafeName() + "_correlation.pdf");
+  m.PrintCorrelationMatrix(myConfig.getString("outpath") + m.GetSafeName() + "_correlationMatrix.pdf");
+  m.PrintKnowledgeUpdatePlots(myConfig.getString("outpath") + m.GetSafeName() + "_update.pdf");
 
-    return 0;
+  m.PrintSummary();
+
+  BCLog::OutSummary("Exiting");
+  BCLog::CloseLog();
+
+  return 0;
 }
