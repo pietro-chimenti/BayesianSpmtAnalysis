@@ -11,11 +11,12 @@ int main( int argc, char *argv[] )
     return -1;
   }
 
-  // open log file
-  BCLog::OpenLog("log.txt", BCLog::detail, BCLog::detail);
-
   BayesianSpmtConfig myConfig;
   myConfig.LoadConfig(std::string(argv[1]));
+
+  // open log file
+  BCLog::OpenLog(myConfig.getString("outpath") + "log.txt", BCLog::detail, BCLog::detail);
+
 
   BayesianSpmtFit m("BayesianSpmtFit",myConfig);
 
