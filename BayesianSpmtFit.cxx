@@ -16,13 +16,13 @@ BayesianSpmtFit::BayesianSpmtFit(const std::string& name, BayesianSpmtConfig& co
   // define parameters, observables, priors and set initial values
 
   if(myConfig.getInt(std::string("par_s2t12"))){
-    AddParameter("s2t12", 0.29, 0.33, "#s2t12", "");
+    AddParameter("s2t12", 0.2, 0.4, "#s2t12", "");
     GetParameter("s2t12").SetPriorConstant();
     book.push_back("s2t12");
   }
 
   if(myConfig.getInt(std::string("par_DelM2_21"))){
-    AddParameter("DelM2_21",7.1e-5,7.5e-5,"#DelM2_21","");
+    AddParameter("DelM2_21",7.e-5,8.e-5,"#DelM2_21","");
     GetParameter("DelM2_21").SetPriorConstant();
     book.push_back("DelM2_21");
   }
