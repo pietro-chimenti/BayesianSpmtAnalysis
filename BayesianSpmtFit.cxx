@@ -205,6 +205,8 @@ void BayesianSpmtFit::set_m_total()
 {
   set_m_stat();
   set_m_norm();
+  set_m_b2b();
+
   M_total.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
   M_total = M_stat;
   if( myConfig.getInt("ll_norm") ) M_total += M_norm;
