@@ -33,12 +33,12 @@ int main( int argc, char *argv[] )
   m.FindMode(m.GetBestFitParameters());
   BCLog::OutSummary("FindMode done");
 
-  m.PrintAllMarginalized(myConfig.getString("outpath") + m.GetSafeName() + "_plots.pdf");
+  //m.PrintAllMarginalized(myConfig.getString("outpath") + m.GetSafeName() + "_plots.pdf");
 
-  m.PrintParameterPlot(myConfig.getString("outpath") + m.GetSafeName() + "_parameters.pdf");
-  m.PrintCorrelationPlot(myConfig.getString("outpath") + m.GetSafeName() + "_correlation.pdf");
-  m.PrintCorrelationMatrix(myConfig.getString("outpath") + m.GetSafeName() + "_correlationMatrix.pdf");
-  m.PrintKnowledgeUpdatePlots(myConfig.getString("outpath") + m.GetSafeName() + "_update.pdf");
+  //m.PrintParameterPlot(myConfig.getString("outpath") + m.GetSafeName() + "_parameters.pdf");
+  //m.PrintCorrelationPlot(myConfig.getString("outpath") + m.GetSafeName() + "_correlation.pdf");
+  //m.PrintCorrelationMatrix(myConfig.getString("outpath") + m.GetSafeName() + "_correlationMatrix.pdf");
+  //m.PrintKnowledgeUpdatePlots(myConfig.getString("outpath") + m.GetSafeName() + "_update.pdf");
 
   m.PrintSummary();
 

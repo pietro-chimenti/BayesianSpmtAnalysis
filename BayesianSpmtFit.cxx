@@ -35,13 +35,19 @@ BayesianSpmtFit::BayesianSpmtFit(const std::string& name, BayesianSpmtConfig& co
 
   AddObservable("s22t12", 0., 1., "#s22t12", "");
 
+  // save bin values in tuple
+  int nBins = myConfig.getInt("nBins");  
+  for(int i = 0; i<nBins; i++){
+    std::string binName = std::string("bin_")+std::to_string(i);
+    std::string binTitle = std::string("#")+binName;
+    AddObservable(binName.c_str(),0.,1e7,binTitle.c_str(),"");
+  }
 
   // initialize oscilation parameters
   InitOscPars();
   LoadSimTree();
   LoadBins();
   LoadSpectrumExp();
-//  PlotNuFit();
 
 }
 
@@ -54,11 +60,25 @@ BayesianSpmtFit::~BayesianSpmtFit()
 void BayesianSpmtFit::LoadParameters(const std::vector<double>& pars)
 {
 
+  bool modified = false;
+
   for( unsigned int i=0; i < pars.size(); ++i ){ 
-    if( book[i] == "s2t12" )    s2t12    = pars[i];
-    if( book[i] == "DelM2_21" ) DelM2_21 = pars[i];
-    if( book[i] == "s2t13" )    s2t13    = pars[i];
+    if( book[i] == "s2t12" && s2t12 != pars[i] ){
+      s2t12    = pars[i];
+      modified = true;
+    }
+    if( book[i] == "DelM2_21" && DelM2_21 != pars[i] ){
+      DelM2_21 = pars[i];
+      modified = true;
+    }
+    if( book[i] == "s2t13" && s2t13 != pars[i] ){
+      s2t13    = pars[i];
+      modified = true;
+    }
   }
+
+  if( modified ) LoadSpectrumTh();
+
 }
 
 // ----------------------------------------------------------------------------
@@ -67,7 +87,6 @@ double BayesianSpmtFit::LogLikelihood(const std::vector<double>& pars)
   double ll=0;
 
   LoadParameters(pars);
-  LoadSpectrumTh();
 
   // calculate terms related to covariance matrix
   for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
@@ -95,6 +114,13 @@ void BayesianSpmtFit::CalculateObservables(const std::vector<double>& pars)
 {
   LoadParameters(pars);
   GetObservable("s22t12") = 4*s2t12*(1-s2t12);
+
+  int nBins = myConfig.getInt("nBins");  
+  for(int i = 0; i<nBins; i++){
+    std::string binName = std::string("bin_")+std::to_string(i);
+    GetObservable(binName.c_str())= spectrum_th[i];
+  }
+
 }
 
 // ----------------------------------------------------------------------------
@@ -232,7 +258,11 @@ void BayesianSpmtFit::LoadSpectrumTh()
     spectrum_th[index]+=Pee(nuE,nuL);
   }
 
-  // now normalize:
+  // now normalize to total number of events:
+  tot_events = myConfig.getInt("tot_meas_events");
+  double sum=0;
+  for(unsigned int i =0; i<spectrum_th.size(); ++i) sum+=spectrum_th[i];
+  normalization=tot_events/sum;
   for(unsigned int i =0; i<spectrum_th.size(); ++i) spectrum_th[i]*=normalization;
  
 
@@ -242,27 +272,14 @@ void BayesianSpmtFit::LoadSpectrumTh()
 void BayesianSpmtFit::LoadSpectrumExp()
 {
 
-  for(double &i: spectrum_exp){ i=0;}
-  double nuE;
-  double nuL;
-  double visE;
-  int index=0;
-  for(auto i : vectorELP){
-    std::tie(nuE,nuL,visE) = i;
-    index=get_bin(visE); 
-    if(index==0||index==binLimits.size()+1) continue;
-    spectrum_exp[index]+=Pee(nuE,nuL);
-  }
+  LoadSpectrumTh();
 
-  // now normalize to total number of events:
-  tot_events = myConfig.getInt("tot_meas_events");
-  double sum=0;
-  for(unsigned int i =0; i<spectrum_exp.size(); ++i) sum+=spectrum_exp[i];
-  normalization=tot_events/sum;
-  for(unsigned int i =0; i<spectrum_exp.size(); ++i) spectrum_exp[i]*=normalization;
+  for(unsigned int i =0; i<spectrum_exp.size(); ++i) spectrum_exp[i]=spectrum_th[i];
+
   for(unsigned int i =0; i<spectrum_exp.size(); ++i) if(spectrum_exp[i]==0)spectrum_exp[i]+=1e-3; // just to avoid a singular error matrix
 
   set_m_inv();
+
 }
 
 // ----------------------------------------------------------------------------
@@ -282,14 +299,4 @@ void BayesianSpmtFit::InitOscPars()
 // ----------------------------------------------------------------------------
 void BayesianSpmtFit::PlotNuFit()
 {
-  // load file first
-  TH1F NuFitOscPlot("NuFitOscPlot","NuFit 4.0 B.F. oscilation",spectrum_exp.size(),binLimits.data());
-  TCanvas ca;
-
-  for(unsigned int i=1; i<=spectrum_exp.size(); ++i){
-    NuFitOscPlot.SetBinContent(i,spectrum_exp[i-1]);
-  }  
-
-  NuFitOscPlot.Draw();
-  ca.SaveAs("NuFitOscPlot.pdf");
 }
