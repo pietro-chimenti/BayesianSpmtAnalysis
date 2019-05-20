@@ -11,7 +11,7 @@
 
 // ----------------------------------------------------------------------------
 BayesianSpmtFit::BayesianSpmtFit(const std::string& name, BayesianSpmtConfig& config)
-    : BCModel(name), book(), myConfig(config)
+    : BCModel(name), book(), myConfig(config), tot_events(0)
 {
   // define parameters, observables, priors and set initial values
 
@@ -209,8 +209,14 @@ void BayesianSpmtFit::set_m_total()
 
   M_total.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
   M_total = M_stat;
-  if( myConfig.getInt("ll_norm") ) M_total += M_norm;
-  if( myConfig.getInt("ll_b2b") ) M_total += M_b2b;
+  if( myConfig.getInt("ll_norm") ){
+    M_total += M_norm;
+    BCLog::OutSummary("Adding ll matrix"); 
+  }
+  if( myConfig.getInt("ll_b2b") ){
+    M_total += M_b2b;
+    BCLog::OutSummary("Adding b2b matrix");
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -261,13 +267,13 @@ void BayesianSpmtFit::LoadSpectrumTh()
   }
 
   // now normalize to total number of events:
-  tot_events = myConfig.getInt("tot_meas_events");
-  double sum=0;
-  for(unsigned int i =0; i<spectrum_th.size(); ++i) sum+=spectrum_th[i];
-  normalization=tot_events/sum;
+  if(!tot_events){// only calculate normalization factor once
+    tot_events = myConfig.getInt("tot_meas_events");
+    double sum=0;
+    for(unsigned int i =0; i<spectrum_th.size(); ++i) sum+=spectrum_th[i];
+    normalization=tot_events/sum;
+  }
   for(unsigned int i =0; i<spectrum_th.size(); ++i) spectrum_th[i]*=normalization;
- 
-
 }
 
 // ----------------------------------------------------------------------------
@@ -276,9 +282,9 @@ void BayesianSpmtFit::LoadSpectrumExp()
 
   LoadSpectrumTh();
 
-  for(unsigned int i =0; i<spectrum_exp.size(); ++i) spectrum_exp[i]=spectrum_th[i];
+  for( unsigned int i = 0; i<spectrum_exp.size(); ++i) spectrum_exp[i]=spectrum_th[i];
 
-  for(unsigned int i =0; i<spectrum_exp.size(); ++i) if(spectrum_exp[i]==0)spectrum_exp[i]+=1e-3; // just to avoid a singular error matrix
+  for( unsigned int i = 0; i<spectrum_exp.size(); ++i) if(spectrum_exp[i]==0)spectrum_exp[i]+=1e-3; // just to avoid a singular error matrix
 
   set_m_inv();
 
