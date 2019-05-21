@@ -103,6 +103,14 @@ public:
      * calculate the shape error matrix: fully uncorrelated approx */ 
     void set_m_b2b();
 
+    /**
+     * calculate flux error */
+    void set_m_flux();
+
+    /**
+     * calculate energy scale error matrix */
+    void set_m_escale();  
+
 
     /**
      *  plot spectra */
@@ -148,11 +156,15 @@ public:
     double normalization; /// calculated from tot_event
 
     /// now error matrixes and pull terms
-    TMatrixDSym M_inv; /// inverse ot the total error matrix
-    TMatrixDSym M_total; /// total error matrix: stat + norm
-    TMatrixDSym M_stat; /// statistical error matrix: diagonal
-    TMatrixDSym M_norm; /// normalization error matrix: fully correlated
-    TMatrixDSym M_b2b;
+    TMatrixDSym M_inv;        /// inverse ot the total error matrix
+    TMatrixDSym M_total;      /// total error matrix: stat + norm
+    TMatrixDSym M_stat;       /// statistical error matrix: diagonal
+    TMatrixDSym M_norm;       /// normalization error matrix: fully correlated
+    TMatrixDSym M_b2b;        /// shape error in the b2b approx.
+    TMatrixDSym M_flux;       /// flux error from Thiago (H.-M. approx)
+    TMatrixDSym M_flux_frac;  /// fractional flux error matrix
+    TMatrixDSym M_EScale;     /// energy scale matrix from Thiago
+    TMatrixDSym M_EScale_frac;/// energy scale matrix from thiago, fractional
 
     double pull_s2t13;
     double pull_s2t13_err;

@@ -23,13 +23,19 @@ int par_DelM2_21 1
 int par_s2t13    1
 
 # following options define the LL terms: 1 - on, 0 - off
-int ll_norm 1 
-int ll_b2b  1
+int ll_norm   0 
+int ll_b2b    0
+int ll_flux   1
+int ll_escale 1
 
 # following parameters define the input simulation file
 string simDataPath Data
 string simDataFile events_SPMT_1e+05evt_20190425.root
 string simTreeName FinalFitIBDTree
+string matrixFile_escale escaleMatrixDClikeEscale_1e07evt_ToyMC_1000sims_th12_0.584_dm2_7.53e-05.root
+string matrixName_escale escale_frac_cov
+string matrixFile_flux FluxMatrixEvis_1e+07evt_1000sims.root
+string matrixName_flux frac_approx 
 
 # this is the classical oscillation factor to use with dimensional E, L and DelM2
 double oscFact 1.27

@@ -206,6 +206,8 @@ void BayesianSpmtFit::set_m_total()
   set_m_stat();
   set_m_norm();
   set_m_b2b();
+  set_m_flux();
+  set_m_escale();
 
   M_total.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
   M_total = M_stat;
@@ -216,6 +218,14 @@ void BayesianSpmtFit::set_m_total()
   if( myConfig.getInt("ll_b2b") ){
     M_total += M_b2b;
     BCLog::OutSummary("Adding b2b matrix");
+  }
+  if( myConfig.getInt("ll_escale") ){
+    M_total += M_EScale;
+    BCLog::OutSummary("Adding EScale matrix");
+  }
+  if( myConfig.getInt("ll_flux") ){
+    M_total += M_flux;
+    BCLog::OutSummary("Adding flux matrix");
   }
 }
 
@@ -248,6 +258,40 @@ void BayesianSpmtFit::set_m_b2b()
     for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
       if( i == j ) M_b2b[i][j] = b2b_error*b2b_error*spectrum_exp[i]*spectrum_exp[j];  
       else M_b2b[i][j] = 0;
+}
+
+// ----------------------------------------------------------------------------
+void BayesianSpmtFit::set_m_flux()
+{
+  std::string filename=myConfig.getString("simDataPath")+"/"+myConfig.getString("matrixFile_flux");
+  TFile f(filename.c_str());
+  TMatrixDSym *flux_frac = (TMatrixDSym*) f.Get(myConfig.getString("matrixName_flux").c_str());
+  M_flux_frac.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
+  for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
+    for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
+      M_flux_frac[i][j] = (*flux_frac)[i][j];  
+
+  M_flux.ResizeTo(spectrum_exp.size(),spectrum_exp.size()); 
+  for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
+    for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
+      M_flux[i][j] = M_flux_frac[i][j]*spectrum_th[i]*spectrum_th[j];  
+}
+
+// ----------------------------------------------------------------------------
+void BayesianSpmtFit::set_m_escale()
+{
+  std::string filename=myConfig.getString("simDataPath")+"/"+myConfig.getString("matrixFile_escale");
+  TFile f(filename.c_str());
+  TMatrixDSym *EScale_frac = (TMatrixDSym*) f.Get(myConfig.getString("matrixName_escale").c_str());
+  M_EScale_frac.ResizeTo(spectrum_exp.size(),spectrum_exp.size());
+  for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
+    for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
+      M_EScale_frac[i][j] = (*EScale_frac)[i][j];  
+
+  M_EScale.ResizeTo(spectrum_exp.size(),spectrum_exp.size()); 
+  for(unsigned int i = 0; i<spectrum_exp.size(); ++i)
+    for(unsigned int j = 0; j<spectrum_exp.size(); ++j)
+      M_EScale[i][j] = M_EScale_frac[i][j]*spectrum_th[i]*spectrum_th[j];
 }
 
 // ----------------------------------------------------------------------------
