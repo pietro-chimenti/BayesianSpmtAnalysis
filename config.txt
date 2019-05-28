@@ -38,7 +38,7 @@ string matrixFile_flux FluxMatrixEvis_1e+07evt_1000sims.root
 string matrixName_flux frac_approx 
 
 # this is the classical oscillation factor to use with dimensional E, L and DelM2
-double oscFact 1.27
+double oscFact 1.26649
 # this is the IBD threshold
 double ibd_th 1.806
 
