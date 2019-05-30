@@ -49,21 +49,59 @@ public:
     void CalculateObservables(const std::vector<double> & pars);
 
     /**
-     * here we load the simulation tree */
-    void LoadSimTree();  
+     * finally save plots */ 
+    void SavePlots();
+
+  private:
 
     /**
-     * here we load the bin limits */ 
-    void LoadBins();    
+     * calculate energy scale error matrix */
+    void set_m_escale();  
+
+    /**
+     * calculate flux error */
+    void set_m_flux();
+
+    /**
+     * calculate the shape error matrix: fully uncorrelated approx */ 
+    void set_m_b2b();
+
+    /**
+     * calculate the normalization error matrix: fully correlated */ 
+    void set_m_norm();
+
+    /**
+     * calculate the statistical error matrix: diag(N_i) */
+    void set_m_stat();
+
+    /**
+     * calculate the total error matrix: stat + norm */
+    void set_m_total();
+
+    /**
+     * calculate the inverse error matrix */ 
+    void set_m_inv();
 
     /**
      * here we load oscillation parameters from fit parameters */ 
     void LoadParameters(const std::vector<double>& pars);
 
     /**
-     * here we load the simulated experimental spectrum
-     * for now with the Asimov aproximation (no statistical fluctuation) */
-    void LoadSpectrumExp();
+     * here we load the simulation tree */
+    void LoadSimTree();  
+
+    /**
+     * here we load the infos necessary to perform the fit:
+     * fractional matrices, pull term infos etc. */
+     void LoadFitInfo(); 
+
+    /**
+     * given the visible energy e return the corresponding bin number */
+    int get_bin(double e);
+
+    /**
+     * calculate the oscillation probability */
+    double Pee(double E, double L);
 
     /**
      * here we load the theoretical spectrum 
@@ -71,50 +109,29 @@ public:
     void LoadSpectrumTh();
 
     /**
-     * calculate the oscillation probability */
-    double Pee(double E, double L);
+     * here we load the Mock simulation to generate Exp data */
+    void LoadMockTree();  
+
+    /**
+     * here we load the bin limits */ 
+    void LoadBins();    
+
+    /**
+     * here we load the simulated experimental spectrum
+     * for now with the Asimov aproximation (no statistical fluctuation) */
+    void LoadSpectrumExp();
+
+    /**
+     * here we set the data used for fit: either simulated or measured */
+     void SetData(); 
 
     /**
      *  set initial values for oscillation parameters */
-    void InitOscPars();
-
-
-    /**
-     * given the visible energy e return the corresponding bin number */
-    int get_bin(double e);
+    void InitPars();
 
     /**
-     * calculate the inverse error matrix */ 
-    void set_m_inv();
-
-    /**
-     * calculate the total error matrix: stat + norm */
-    void set_m_total();
-
-    /**
-     * calculate the statistical error matrix: diag(N_i) */
-    void set_m_stat();
-
-    /**
-     * calculate the normalization error matrix: fully correlated */ 
-    void set_m_norm();
-
-    /**
-     * calculate the shape error matrix: fully uncorrelated approx */ 
-    void set_m_b2b();
-
-    /**
-     * calculate flux error */
-    void set_m_flux();
-
-    /**
-     * calculate energy scale error matrix */
-    void set_m_escale();  
-
-
-    /**
-     *  plot spectra */
-    void PlotNuFit();
+     * here se set the fit parameters, priors and observables */
+    void SetParameters();
 
 // ----------------------------------------------------------------------------
 // now fields
