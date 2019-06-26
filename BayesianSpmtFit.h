@@ -168,9 +168,9 @@ public:
     double s2t13; /// Sin^2(t_13)
     double DelM2_21; /// Delta M^2_21
     double DelM2_31; /// Delta M^2_31 - positive or negative depending on M.H.
+    double normalization; 
 
-    double tot_events; /// normalization
-    double normalization; /// calculated from tot_event
+    double tot_events; 
 
     /// now error matrixes and pull terms
     TMatrixDSym M_inv;        /// inverse ot the total error matrix

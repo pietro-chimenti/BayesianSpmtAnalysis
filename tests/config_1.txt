@@ -3,25 +3,25 @@
 # author: Pietro Chimenti
 
 # path for output
-string outpath output/
+string outpath output_1/
 
 # set the number of samples for MCMC
 # N Chains
 int NC    1
 # N Iterations Pre Run Check
-int NIPRC 30
+int NIPRC 300
 # N Iterations Pre Run MIn
-int NIPRMI 90
+int NIPRMI 900
 # N Iterations Pre Run MAx
-int NIPRMA 300
+int NIPRMA 3000
 # N Iterations Run
-int NIR   300
+int NIR   3000
 
 # following options define the paramenters 1: on, 0: off
 int par_s2t12    1
 int par_DelM2_21 1
-int par_s2t13    1
-int par_norm     1
+int par_s2t13    0
+int par_norm     0
 
 # the following parameter set the maximum normalization value
 double max_norm 10
@@ -29,8 +29,8 @@ double max_norm 10
 # following options define the LL terms: 1 - on, 0 - off
 int ll_norm   0 
 int ll_b2b    0
-int ll_flux   1
-int ll_escale 1
+int ll_flux   0
+int ll_escale 0
 
 # following parameters define the input simulation file
 string simDataPath Data

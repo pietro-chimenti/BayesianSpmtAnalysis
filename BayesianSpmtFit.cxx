@@ -126,25 +126,25 @@ void BayesianSpmtFit::set_m_total()
   if( myConfig.getInt("ll_norm") ){
     set_m_norm();
     M_total += M_norm;
-    BCLog::OutSummary("Adding ll matrix"); 
+    BCLog::OutDebug("Adding ll matrix"); 
   }
 
   if( myConfig.getInt("ll_b2b") ){
     set_m_b2b();
     M_total += M_b2b;
-    BCLog::OutSummary("Adding b2b matrix");
+    BCLog::OutDebug("Adding b2b matrix");
   }
 
   if( myConfig.getInt("ll_escale") ){
     set_m_escale();
     M_total += M_EScale;
-    BCLog::OutSummary("Adding EScale matrix");
+    BCLog::OutDebug("Adding EScale matrix");
   }
 
   if( myConfig.getInt("ll_flux") ){
     set_m_flux();
     M_total += M_flux;
-    BCLog::OutSummary("Adding flux matrix");
+    BCLog::OutDebug("Adding flux matrix");
   }
 }
 
@@ -176,6 +176,10 @@ void BayesianSpmtFit::LoadParameters(const std::vector<double>& pars)
       s2t13    = pars[i];
       modified = true;
     }
+    if( book[i] == "normalization" && normalization != pars[i] ){
+      normalization = pars[i];
+      modified = true;
+    }
   }
 
   if( modified ) LoadSpectrumTh();
@@ -197,7 +201,9 @@ void BayesianSpmtFit::LoadSimTree()
   simTree->SetBranchAddress("myNeutrinoEnergy_Th",&NeutrinoEnergy_Th);
   simTree->SetBranchAddress("myNeutrinoDistance_Th",&NeutrinoDistance_Th);
   simTree->SetBranchAddress("myPromptEvisID",&PromptEvisID);
-  for(int i=0; i<simTree->GetEntries(); i++){
+  int maxEvents = myConfig.getInt("simTreeMaxEvents");
+  if( maxEvents == 0 ) maxEvents = simTree->GetEntries(); 
+  for( int i = 0 ; i < maxEvents ; ++i ){
     simTree->GetEntry(i);
     vectorELP.push_back(std::make_tuple(NeutrinoEnergy_Th,NeutrinoDistance_Th,PromptEvisID));
   }
@@ -309,7 +315,9 @@ void BayesianSpmtFit::LoadMockTree()
   simTree->SetBranchAddress("myNeutrinoEnergy_Th",&NeutrinoEnergy_Th);
   simTree->SetBranchAddress("myNeutrinoDistance_Th",&NeutrinoDistance_Th);
   simTree->SetBranchAddress("myPromptEvisID",&PromptEvisID);
-  for(int i=0; i<simTree->GetEntries(); i++){
+  int maxEvents = myConfig.getInt("simTreeMaxEvents");
+  if( maxEvents == 0 ) maxEvents = simTree->GetEntries(); 
+  for( int i = 0 ; i < maxEvents ; ++i ){
     simTree->GetEntry(i);
     vectorELP.push_back(std::make_tuple(NeutrinoEnergy_Th,NeutrinoDistance_Th,PromptEvisID));
   }
@@ -379,6 +387,12 @@ void BayesianSpmtFit::SetParameters()
     AddParameter("s2t13",0.01,0.04,"#s2t13","");
     GetParameter("s2t13").SetPriorConstant();
     book.push_back("s2t13");
+  }
+
+  if( myConfig.getInt(std::string("par_norm"))){
+    AddParameter("normalization", 0, myConfig.getDouble("max_norm"),"#norm","");
+    GetParameter("normalization").SetPriorConstant();
+    book.push_back("normalization");
   }
 
   AddObservable("s22t12", 0., 1., "#s22t12", "");
